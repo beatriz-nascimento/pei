@@ -16,4 +16,10 @@ export default tseslint.config(
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
+  {
+    // NestJS lê os tipos dos construtores em tempo de execução (emitDecoratorMetadata).
+    // Trocar por `import type` apagaria essa informação e quebraria a injeção de dependência.
+    files: ['apps/api/**/*.ts'],
+    rules: { '@typescript-eslint/consistent-type-imports': 'off' },
+  },
 );
