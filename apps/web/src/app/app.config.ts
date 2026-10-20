@@ -8,6 +8,7 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
@@ -34,6 +35,11 @@ export function createAppConfig(config: AppConfig, mock?: MockBackend): Applicat
         withFetch(),
         withInterceptors([authInterceptor, ...(mock ? [mock.interceptor] : [])]),
       ),
+      // Hint/erro só ocupam espaço quando existem, deixando os formulários mais enxutos.
+      {
+        provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+        useValue: { appearance: 'outline', subscriptSizing: 'dynamic' },
+      },
       { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { verticalPosition: 'bottom' } },
       provideAppInitializer(() => {
         // Ícones do Material Symbols (fonte carregada no index.html).

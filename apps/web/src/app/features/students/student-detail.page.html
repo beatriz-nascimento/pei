@@ -142,7 +142,7 @@
 
         @if (session.isAdmin()) {
           <div class="add-staff">
-            <mat-form-field subscriptSizing="dynamic">
+            <mat-form-field>
               <mat-label>Profissional</mat-label>
               <mat-select [value]="newStaffUser()" (valueChange)="newStaffUser.set($event)">
                 @for (m of availableMembers(); track m.userId) {
@@ -152,7 +152,7 @@
                 }
               </mat-select>
             </mat-form-field>
-            <mat-form-field subscriptSizing="dynamic">
+            <mat-form-field>
               <mat-label>Função</mat-label>
               <mat-select [value]="newStaffFunction()" (valueChange)="newStaffFunction.set($event)">
                 @for (o of staffFunctions; track o[0]) {

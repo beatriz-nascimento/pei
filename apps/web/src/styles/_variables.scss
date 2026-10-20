@@ -1,0 +1,23 @@
+// Variáveis de tema do app. As cores vêm do Material Theme Builder
+// (material-foundation.github.io/material-theme-builder → Export → Material Theme JSON).
+// Para trocar, exporte um novo JSON e rode, dentro de apps/web:
+//
+//   npm run theme -- caminho/para/material-theme.json
+//
+// Isso regera `_theme-colors.scss` (paletas e esquemas).
+
+// `light dark` segue a preferência do sistema; `light` fixa o tema claro.
+$color-scheme: light dark;
+
+$font-family: 'Inter Variable, Roboto, sans-serif';
+$density: 0;
+// Densidade só dos form fields: 0 = 56px de altura, -1 = 52px, -2 = 48px, -3 = 44px, -4 = 40px.
+$form-field-density: -2;
+
+// Cores dos níveis de progresso 
+$level-not-observed: #c62828;
+$level-emerging: #ef6c00;
+$level-developing: #f9a825;
+$level-achieved: #2e7d32;
+
+$content-max: 1120px;

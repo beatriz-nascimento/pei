@@ -30,7 +30,7 @@ const Schema = z.object({ items: z.array(Service).max(20) });
       @for (item of f.items; track $index; let i = $index) {
         <div class="item-card stack">
           <div class="item-header">
-            <mat-form-field subscriptSizing="dynamic" class="area">
+            <mat-form-field class="area">
               <mat-label>Serviço</mat-label>
               <mat-select [formField]="item.type">
                 @for (o of types; track o[0]) {

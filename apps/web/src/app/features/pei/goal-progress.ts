@@ -64,7 +64,7 @@ import { ProgressButtons, ProgressHistory } from '../../shared/progress';
                 <mat-button-toggle [value]="o[0]">{{ o[1] }}</mat-button-toggle>
               }
             </mat-button-toggle-group>
-            <mat-form-field subscriptSizing="dynamic">
+            <mat-form-field>
               <mat-label>Observação</mat-label>
               <input
                 matInput

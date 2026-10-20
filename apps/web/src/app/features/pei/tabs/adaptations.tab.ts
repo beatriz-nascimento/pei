@@ -29,7 +29,7 @@ const Schema = z.object({ items: z.array(Adaptation).max(50) });
     <form class="stack" (submit)="save($event)" novalidate>
       @for (item of f.items; track $index; let i = $index) {
         <div class="item-card item-inline">
-          <mat-form-field subscriptSizing="dynamic" class="area">
+          <mat-form-field class="area">
             <mat-label>Tipo</mat-label>
             <mat-select [formField]="item.category">
               @for (o of categories; track o[0]) {

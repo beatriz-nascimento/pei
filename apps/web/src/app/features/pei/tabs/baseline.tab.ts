@@ -34,7 +34,7 @@ const Schema = z.object({ items: z.array(BaselineEntry).max(20) });
       @for (item of f.items; track $index; let i = $index) {
         <div class="item-card stack">
           <div class="item-header">
-            <mat-form-field subscriptSizing="dynamic" class="area">
+            <mat-form-field class="area">
               <mat-label>Área</mat-label>
               <mat-select [formField]="item.area">
                 @for (o of areas; track o[0]) {

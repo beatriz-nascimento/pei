@@ -4,30 +4,54 @@
 // material-symbols: ícones Material Symbols empacotados para npm.
 @use '@fontsource-variable/inter';
 @use 'material-symbols/outlined';
+@use 'sass:map';
+@use 'styles/variables' as theme;
+@use 'styles/theme-colors' as palettes;
 
-// Tema Material 3. Cores claras/escuras seguem a preferência do sistema.
+// Junta os esquemas claro e escuro do Theme Builder em tokens `light-dark()`.
+@function _scheme($light, $dark) {
+  $tokens: ();
+  @each $name, $value in $light {
+    $tokens: map.set($tokens, $name, light-dark($value, map.get($dark, $name)));
+  }
+  @return $tokens;
+}
+
+// Tema Material 3. As variáveis ficam em styles/_variables.scss.
 html {
-  color-scheme: light dark;
+  color-scheme: theme.$color-scheme;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$violet-palette,
+        primary: palettes.$primary-palette,
+        tertiary: palettes.$tertiary-palette,
       ),
       typography: (
-        plain-family: 'Inter Variable, Roboto, sans-serif',
-        brand-family: 'Inter Variable, Roboto, sans-serif',
+        plain-family: theme.$font-family,
+        brand-family: theme.$font-family,
       ),
-      density: 0,
+      density: theme.$density,
     )
   );
 
-  // Tokens próprios: cores dos níveis de progresso (mesmas do documento exportado).
-  --pei-level-not-observed: #c62828;
-  --pei-level-emerging: #ef6c00;
-  --pei-level-developing: #f9a825;
-  --pei-level-achieved: #2e7d32;
-  --pei-content-max: 1120px;
+  // Esquemas do Material Theme Builder (styles/_theme-colors.scss): o Angular gera os tokens a
+  // partir das paletas, e os esquemas exportados garantem os mesmos valores do Theme Builder.
+  @include mat.theme-overrides(_scheme(palettes.$light, palettes.$dark));
+
+  // Alto contraste quando o sistema pede (Windows, macOS "Aumentar contraste").
+  @media (prefers-contrast: more) {
+    @include mat.theme-overrides(
+      _scheme(palettes.$light-high-contrast, palettes.$dark-high-contrast)
+    );
+  }
+
+  @include mat.form-field-density(mat.define-theme((density: (scale: theme.$form-field-density))));
+
+  --pei-level-not-observed: #{theme.$level-not-observed};
+  --pei-level-emerging: #{theme.$level-emerging};
+  --pei-level-developing: #{theme.$level-developing};
+  --pei-level-achieved: #{theme.$level-achieved};
+  --pei-content-max: #{theme.$content-max};
 }
 
 html,
