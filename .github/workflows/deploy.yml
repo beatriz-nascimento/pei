@@ -31,7 +31,7 @@ jobs:
       REGION: southamerica-east1
       PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # 1. Migrações do banco no Supabase (antes da API nova subir).
       - uses: supabase/setup-cli@v1
