@@ -1,0 +1,78 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    #drawer
+    [mode]="isHandset() ? 'over' : 'side'"
+    [opened]="!isHandset()"
+    class="sidenav"
+    aria-label="Menu principal"
+  >
+    <div class="sidenav-brand">
+      <mat-icon aria-hidden="true">school</mat-icon>
+      <span>PEI</span>
+    </div>
+    <mat-nav-list>
+      @for (item of nav(); track item.path) {
+        <a
+          mat-list-item
+          [routerLink]="[...base(), item.path]"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive"
+          (click)="isHandset() && drawer.close()"
+        >
+          <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="toolbar">
+      @if (isHandset()) {
+        <button mat-icon-button (click)="drawer.toggle()" aria-label="Abrir menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+
+      @if (session.membership(); as current) {
+        <button mat-button [matMenuTriggerFor]="tenantMenu" class="tenant-button">
+          <mat-icon>{{ current.tenantType === 'school' ? 'apartment' : 'person' }}</mat-icon>
+          <span class="tenant-name">{{ current.tenantName }}</span>
+          <mat-icon iconPositionEnd>expand_more</mat-icon>
+        </button>
+        <mat-menu #tenantMenu="matMenu">
+          @for (m of session.me()?.memberships ?? []; track m.tenantId) {
+            <button mat-menu-item (click)="switchTenant(m.tenantId)">
+              <mat-icon>{{ m.tenantId === current.tenantId ? 'check' : '' }}</mat-icon>
+              <span>{{ m.tenantName }} · {{ m.role | label: 'memberRole' }}</span>
+            </button>
+          }
+          <mat-divider />
+          <a mat-menu-item routerLink="/comecar">
+            <mat-icon>add</mat-icon>
+            <span>Criar outra conta</span>
+          </a>
+        </mat-menu>
+      }
+
+      <span class="spacer"></span>
+
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menu do usuário">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-info" mat-menu-item disabled>
+          {{ session.me()?.fullName ?? auth.email() }}
+        </div>
+        <mat-divider />
+        <button mat-menu-item (click)="signOut()">
+          <mat-icon>logout</mat-icon>
+          <span>Sair</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

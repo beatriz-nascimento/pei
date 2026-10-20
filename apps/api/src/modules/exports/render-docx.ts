@@ -31,9 +31,12 @@ function cell(text: string, opts: { header?: boolean; widthPct?: number } = {}):
       ? { type: ShadingType.CLEAR, color: 'auto', fill: HEADER_FILL }
       : undefined,
     margins: { top: 60, bottom: 60, left: 100, right: 100 },
-    children: text.split('\n').map(
-      (line) => new Paragraph({ children: [new TextRun({ text: line, bold: opts.header, size: 18 })] }),
-    ),
+    children: text
+      .split('\n')
+      .map(
+        (line) =>
+          new Paragraph({ children: [new TextRun({ text: line, bold: opts.header, size: 18 })] }),
+      ),
   });
 }
 
@@ -50,7 +53,9 @@ function blockToChildren(block: Block): Array<Paragraph | Table> {
     case 'paragraph':
       return [
         new Paragraph({
-          children: [new TextRun({ text: block.text, color: block.muted ? MUTED : undefined, size: 18 })],
+          children: [
+            new TextRun({ text: block.text, color: block.muted ? MUTED : undefined, size: 18 }),
+          ],
         }),
       ];
     case 'fields':
@@ -60,7 +65,10 @@ function blockToChildren(block: Block): Array<Paragraph | Table> {
           rows: block.rows.map(
             ([label, value]) =>
               new TableRow({
-                children: [cell(label, { header: true, widthPct: 28 }), cell(value, { widthPct: 72 })],
+                children: [
+                  cell(label, { header: true, widthPct: 28 }),
+                  cell(value, { widthPct: 72 }),
+                ],
               }),
           ),
         }),
@@ -85,10 +93,15 @@ function blockToChildren(block: Block): Array<Paragraph | Table> {
     }
     case 'signatures':
       return block.people.flatMap((p) => [
-        new Paragraph({ spacing: { before: 480 }, children: [new TextRun('_______________________________________')] }),
+        new Paragraph({
+          spacing: { before: 480 },
+          children: [new TextRun('_______________________________________')],
+        }),
         new Paragraph({ children: [new TextRun({ text: p.name || ' ', bold: true, size: 18 })] }),
         new Paragraph({
-          children: [new TextRun({ text: `${p.role} · Data: ____/____/______`, color: MUTED, size: 16 })],
+          children: [
+            new TextRun({ text: `${p.role} · Data: ____/____/______`, color: MUTED, size: 16 }),
+          ],
         }),
       ]);
   }
@@ -113,7 +126,10 @@ export async function renderDocx(model: DocModel): Promise<Buffer> {
               new Paragraph({
                 alignment: AlignmentType.RIGHT,
                 children: [
-                  new TextRun({ children: [PageNumber.CURRENT, '/', PageNumber.TOTAL_PAGES], size: 14 }),
+                  new TextRun({
+                    children: [PageNumber.CURRENT, '/', PageNumber.TOTAL_PAGES],
+                    size: 14,
+                  }),
                 ],
               }),
             ],

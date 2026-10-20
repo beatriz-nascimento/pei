@@ -7,5 +7,8 @@ export const TEST_DATABASE_URL =
 /** Recria o banco de teste (shim do Supabase + migrações) uma vez por execução. */
 export default function setup(): void {
   const script = fileURLToPath(new URL('../../../supabase/tests/reset-db.sh', import.meta.url));
-  execFileSync(script, { env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL }, stdio: 'inherit' });
+  execFileSync(script, {
+    env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
+    stdio: 'inherit',
+  });
 }

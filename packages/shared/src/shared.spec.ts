@@ -62,3 +62,27 @@ describe('progressTrend', () => {
     expect(progressTrend(['achieved', 'emerging'])).toBe('down');
   });
 });
+
+describe('campos vindos de formulário', () => {
+  it('converte datas vazias', async () => {
+    const { CreateStudentInput, UpdatePeiInput, CreateTenantInput } = await import('./index.js');
+    expect(CreateStudentInput.parse({ fullName: 'A', birthDate: '' }).birthDate).toBeUndefined();
+    expect(UpdatePeiInput.parse({ startDate: '' }).startDate).toBeNull();
+    expect(CreateTenantInput.parse({ name: 'X', type: 'school', state: '' }).state).toBeUndefined();
+    expect(CreateTenantInput.parse({ name: 'X', type: 'school', state: 'pr' }).state).toBe('PR');
+  });
+});
+
+describe('BNCC', () => {
+  it('aceita código em minúsculas e normaliza', async () => {
+    const { GoalInput } = await import('./index.js');
+    const g = GoalInput.parse({
+      area: 'academica',
+      description: 'x',
+      successCriterion: 'y',
+      targetDate: '2026-12-01',
+      bnccCode: 'ef01lp02',
+    });
+    expect(g.bnccCode).toBe('EF01LP02');
+  });
+});

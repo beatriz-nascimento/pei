@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      angular: { patterns: ['@angular/*', '@angular-devkit/*', 'angular-eslint'] }
+      nestjs: { patterns: ['@nestjs/*'] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directories: [/apps/api, /apps/web]
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: /infra/terraform
+    schedule: { interval: weekly }

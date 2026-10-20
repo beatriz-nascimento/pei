@@ -1,0 +1,59 @@
+.auth-layout {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 15% 10%, var(--mat-sys-primary-container), transparent 45%),
+    radial-gradient(circle at 85% 90%, var(--mat-sys-tertiary-container), transparent 40%),
+    var(--mat-sys-surface);
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  background: var(--mat-sys-surface-container-lowest);
+  border-radius: var(--mat-sys-corner-extra-large);
+  padding: 28px 24px;
+  box-shadow: var(--mat-sys-level2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: var(--mat-sys-primary);
+  }
+
+  p {
+    margin: 2px 0 0;
+  }
+}
+
+.tab-body {
+  padding-top: 20px;
+}
+
+.alert {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--mat-sys-corner-medium);
+}
+
+.alert-error {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.alert-info {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}

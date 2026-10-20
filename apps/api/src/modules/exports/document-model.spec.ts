@@ -16,6 +16,7 @@ export const sampleStudent: Student = {
   guardians: [{ name: 'Marina Lima', relationship: 'Mãe' }],
   staff: [{ userId: 'u1', fullName: 'Bia Souza', email: 'bia@x.com', function: 'aee' }],
   activePeiId: 'p1',
+  archivedAt: null,
   createdAt: '2026-03-01T00:00:00Z',
   updatedAt: '2026-03-01T00:00:00Z',
 };
@@ -40,10 +41,18 @@ export const samplePei: Pei = {
     communication: '',
     previousInterventions: '',
   },
-  baseline: [{ area: 'comunicacao', currentPerformance: 'Pede ajuda com apoio verbal', evidence: '' }],
+  baseline: [
+    { area: 'comunicacao', currentPerformance: 'Pede ajuda com apoio verbal', evidence: '' },
+  ],
   adaptations: [{ category: 'material', description: 'Rotina visual na mesa' }],
   services: [
-    { type: 'aee_sala_recursos', provider: 'Bia', frequency: '2x/semana', durationMinutes: 50, location: 'Sala de recursos' },
+    {
+      type: 'aee_sala_recursos',
+      provider: 'Bia',
+      frequency: '2x/semana',
+      durationMinutes: 50,
+      location: 'Sala de recursos',
+    },
   ],
   goals: [
     {

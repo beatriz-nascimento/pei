@@ -1,0 +1,66 @@
+<div class="page">
+  <header class="page-header">
+    <h1>Alunos</h1>
+    @if (session.isAdmin()) {
+      <button mat-flat-button (click)="create()"><mat-icon>person_add</mat-icon> Novo aluno</button>
+    }
+  </header>
+
+  <div class="filters">
+    <mat-form-field class="search" subscriptSizing="dynamic">
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-label>Buscar pelo nome</mat-label>
+      <input matInput type="search" [value]="query()" (input)="onSearch($event)" />
+    </mat-form-field>
+    <mat-slide-toggle [checked]="showArchived()" (change)="showArchived.set($event.checked)">
+      Arquivados
+    </mat-slide-toggle>
+  </div>
+
+  @if (students.isLoading()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Carregando alunos" />
+  }
+
+  @if (students.error()) {
+    <div class="empty-state" role="alert">
+      <mat-icon>cloud_off</mat-icon>
+      <p>Não foi possível carregar os alunos.</p>
+      <button mat-stroked-button (click)="students.reload()">Tentar de novo</button>
+    </div>
+  } @else if (list().length === 0 && !students.isLoading()) {
+    <div class="empty-state">
+      <mat-icon>groups</mat-icon>
+      @if (query()) {
+        <p>Nenhum aluno encontrado para "{{ query() }}".</p>
+      } @else if (session.isAdmin()) {
+        <p>Nenhum aluno cadastrado ainda.</p>
+        <button mat-flat-button (click)="create()">Cadastrar o primeiro aluno</button>
+      } @else {
+        <p>Você ainda não foi vinculado(a) a nenhum aluno. Fale com a coordenação.</p>
+      }
+    </div>
+  } @else {
+    <mat-nav-list class="student-list">
+      @for (s of list(); track s.id) {
+        <a mat-list-item [routerLink]="['/t', session.tenantId(), 'alunos', s.id]" lines="2">
+          <span matListItemAvatar class="avatar" aria-hidden="true">{{
+            s.fullName.charAt(0)
+          }}</span>
+          <span matListItemTitle>{{ s.fullName }}</span>
+          <span matListItemLine class="muted">
+            {{ s.grade || 'Série não informada'
+            }}{{ s.classGroup ? ' · Turma ' + s.classGroup : '' }}
+            {{ s.schoolName ? ' · ' + s.schoolName : '' }}
+          </span>
+          <span matListItemMeta class="meta">
+            @if (s.activePeiId) {
+              <span class="badge badge-active">PEI em vigor</span>
+            } @else {
+              <span class="badge">Sem PEI em vigor</span>
+            }
+          </span>
+        </a>
+      }
+    </mat-nav-list>
+  }
+</div>

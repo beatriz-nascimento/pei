@@ -53,8 +53,7 @@ export class ExportService {
       ? { buffer: await renderPdf(model), contentType: 'application/pdf', filename: `${base}.pdf` }
       : {
           buffer: await renderDocx(model),
-          contentType:
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           filename: `${base}.docx`,
         };
   }

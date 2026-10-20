@@ -1,0 +1,6 @@
+{
+  "apiUrl": "http://localhost:3000/v1",
+  "supabaseUrl": "http://127.0.0.1:54321",
+  "supabaseAnonKey": "COLE-AQUI-A-CHAVE-PUBLICA-DO-SUPABASE-LOCAL",
+  "mock": true
+}

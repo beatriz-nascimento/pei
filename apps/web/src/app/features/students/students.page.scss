@@ -1,0 +1,29 @@
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.search {
+  flex: 1 1 280px;
+}
+
+.student-list {
+  background: var(--mat-sys-surface-container-lowest);
+  border-radius: var(--mat-sys-corner-large);
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 600;
+}
+
+.meta {
+  align-self: center;
+}

@@ -1,0 +1,45 @@
+.shell {
+  height: 100dvh;
+}
+
+.sidenav {
+  width: 240px;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.sidenav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 12px;
+  font: var(--mat-sys-title-large);
+  color: var(--mat-sys-primary);
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mat-sys-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  gap: 8px;
+}
+
+.tenant-button {
+  max-width: min(60vw, 420px);
+}
+
+.tenant-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  opacity: 1 !important;
+}

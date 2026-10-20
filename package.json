@@ -2,21 +2,25 @@
   "name": "pei",
   "private": true,
   "description": "SaaS para elaboração e acompanhamento de Planos Educacionais Individualizados (PEI)",
-  "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=24.15.0"
   },
+  "workspaces": [
+    "packages/shared",
+    "apps/api",
+    "apps/web"
+  ],
   "scripts": {
-    "build": "pnpm -r --workspace-concurrency=1 run build",
-    "build:shared": "pnpm --filter @pei/shared build",
-    "dev:api": "pnpm --filter @pei/api dev",
-    "dev:web": "pnpm --filter @pei/web start",
-    "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck",
-    "test": "pnpm -r --workspace-concurrency=1 run test",
+    "build": "npm run build --workspaces --if-present",
+    "build:shared": "npm run build -w @pei/shared",
+    "dev:api": "npm run dev -w @pei/api",
+    "dev:web": "npm run start -w @pei/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:types": "pnpm --filter @pei/api db:types"
+    "db:types": "npm run db:types -w @pei/api"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

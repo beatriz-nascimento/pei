@@ -123,10 +123,11 @@ describe('fluxo Escola', () => {
   });
 
   it('② cria o PEI em rascunho', async () => {
-    const res = await api(app, aee).post(
-      `/v1/tenants/${tenant.id}/students/${student.id}/peis`,
-      { schoolYear: 2026, startDate: '2026-03-01', reviewDate: '2026-07-15' },
-    );
+    const res = await api(app, aee).post(`/v1/tenants/${tenant.id}/students/${student.id}/peis`, {
+      schoolYear: 2026,
+      startDate: '2026-03-01',
+      reviewDate: '2026-07-15',
+    });
     expect(res.status).toBe(201);
     pei = res.body;
     expect(pei).toMatchObject({ status: 'draft', version: 1, canEdit: true });
@@ -212,6 +213,10 @@ describe('fluxo Escola', () => {
     expect(active.status).toBe(200);
     expect(active.body.status).toBe('active');
 
+    const active2 = await api(app, regente).get(`/v1/tenants/${tenant.id}/active-goals`);
+    expect(active2.body).toHaveLength(2);
+    expect(active2.body[0]).toMatchObject({ studentName: 'Lucas Andrade Lima', canEdit: false });
+
     const v2 = await api(app, aee).post(`/v1/tenants/${tenant.id}/students/${student.id}/peis`, {
       schoolYear: 2026,
       copyFromPeiId: pei.id,
@@ -221,18 +226,24 @@ describe('fluxo Escola', () => {
     expect(v2.body.goals.every((g: { status: string }) => g.status === 'not_started')).toBe(true);
 
     // Rascunho pode ser excluído; o PEI em vigor não.
-    expect((await api(app, aee).del(`/v1/tenants/${tenant.id}/peis/${v2.body.id}`)).status).toBe(204);
+    expect((await api(app, aee).del(`/v1/tenants/${tenant.id}/peis/${v2.body.id}`)).status).toBe(
+      204,
+    );
     expect((await api(app, aee).del(`/v1/tenants/${tenant.id}/peis/${pei.id}`)).status).toBe(409);
   });
 
   it('⑤ gera o documento em PDF e DOCX', async () => {
-    const pdf = await api(app, aee).get(`/v1/tenants/${tenant.id}/peis/${pei.id}/export?format=pdf`);
+    const pdf = await api(app, aee).get(
+      `/v1/tenants/${tenant.id}/peis/${pei.id}/export?format=pdf`,
+    );
     expect(pdf.status).toBe(200);
     expect(pdf.headers['content-type']).toBe('application/pdf');
     expect(pdf.headers['content-disposition']).toContain('PEI_Lucas_Andrade_Lima_2026_v1.pdf');
     expect(pdf.raw.subarray(0, 5).toString()).toBe('%PDF-');
 
-    const docx = await api(app, aee).get(`/v1/tenants/${tenant.id}/peis/${pei.id}/export?format=docx`);
+    const docx = await api(app, aee).get(
+      `/v1/tenants/${tenant.id}/peis/${pei.id}/export?format=docx`,
+    );
     expect(docx.status).toBe(200);
     expect(docx.raw.subarray(0, 2).toString()).toBe('PK'); // .docx é um zip
 
@@ -255,9 +266,10 @@ describe('fluxo Escola', () => {
     expect(familyUrl).toMatch(/^http:\/\/app\.test\/familia\/[\w-]{43}$/);
 
     // O token não fica guardado em texto puro.
-    const { rows } = await adminPool.query(`select token_hash from public.family_links where id = $1`, [
-      link.id,
-    ]);
+    const { rows } = await adminPool.query(
+      `select token_hash from public.family_links where id = $1`,
+      [link.id],
+    );
     expect(rows[0].token_hash).toHaveLength(64);
     expect(familyUrl).not.toContain(rows[0].token_hash);
   });
@@ -270,7 +282,11 @@ describe('fluxo Escola', () => {
     expect(first.status).toBe(200);
     expect(first.body.consent.required).toBe(true);
     expect(first.body.peis).toEqual([]);
-    expect(first.body.student).toEqual({ firstName: 'Lucas', grade: '3º ano', schoolName: 'Escola Aurora' });
+    expect(first.body.student).toEqual({
+      firstName: 'Lucas',
+      grade: '3º ano',
+      schoolName: 'Escola Aurora',
+    });
 
     const consent = await anon.post(`/v1/public/family/${token}/consent`, {
       guardianName: 'Marina Lima',
@@ -310,7 +326,10 @@ describe('fluxo Escola', () => {
 describe('isolamento entre contas', () => {
   it('uma conta Profissional não vê nada da Escola', async () => {
     const fono = await createUser('Fonoaudióloga Dani');
-    const own = await api(app, fono).post('/v1/tenants', { name: 'Dani Fono', type: 'professional' });
+    const own = await api(app, fono).post('/v1/tenants', {
+      name: 'Dani Fono',
+      type: 'professional',
+    });
     expect(own.status).toBe(201);
 
     const asFono = api(app, fono);
@@ -318,7 +337,9 @@ describe('isolamento entre contas', () => {
     expect((await asFono.get(`/v1/tenants/${tenant.id}/students`)).status).toBe(404);
     // Mesmo trocando o tenant da URL pelo próprio, o PEI de outra conta não aparece.
     expect((await asFono.get(`/v1/tenants/${own.body.id}/peis/${pei.id}`)).status).toBe(404);
-    expect((await asFono.get(`/v1/tenants/${own.body.id}/students/${student.id}`)).status).toBe(404);
+    expect((await asFono.get(`/v1/tenants/${own.body.id}/students/${student.id}`)).status).toBe(
+      404,
+    );
   });
 
   it('rejeita token inválido', async () => {
@@ -339,7 +360,9 @@ describe('administração', () => {
   });
 
   it('a trilha de auditoria não pode ser alterada', async () => {
-    await expect(adminPool.query(`delete from public.audit_log`)).rejects.toThrow(/somente inclusão/);
+    await expect(adminPool.query(`delete from public.audit_log`)).rejects.toThrow(
+      /somente inclusão/,
+    );
     await expect(adminPool.query(`update public.audit_log set action = 'x'`)).rejects.toThrow(
       /somente inclusão/,
     );

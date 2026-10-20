@@ -1,0 +1,93 @@
+.back {
+  margin: -8px 0 8px -12px;
+}
+
+.pei-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  .title p {
+    margin: 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mat-sys-on-surface-variant);
+
+  &.done {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.tab-body {
+  padding: 20px 2px;
+}
+
+// Estilos compartilhados pelas abas (componentes filhos).
+:host ::ng-deep {
+  .item-card {
+    padding: 16px;
+    border-radius: var(--mat-sys-corner-large);
+    border: 1px solid var(--mat-sys-outline-variant);
+    background: var(--mat-sys-surface-container-lowest);
+  }
+
+  .item-header,
+  .item-inline {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .item-inline {
+    align-items: flex-start;
+  }
+
+  .area {
+    flex: 0 1 260px;
+  }
+
+  .grow {
+    flex: 1 1 auto;
+  }
+
+  .tab-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    position: sticky;
+    bottom: 0;
+    padding: 12px 0;
+    background: var(--mat-sys-surface);
+  }
+}

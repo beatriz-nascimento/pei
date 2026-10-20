@@ -20,6 +20,7 @@ import {
   ReorderGoalsInput,
   UpdateGoalInput,
   UpdatePeiInput,
+  type ActiveGoal,
   type GoalData,
   type Goal,
   type Pei,
@@ -44,6 +45,11 @@ export class PeisController {
     private readonly peis: PeisService,
     private readonly exporter: ExportService,
   ) {}
+
+  @Get('active-goals')
+  activeGoals(@CurrentUser() user: AuthUser, @Tenant() t: TenantContext): Promise<ActiveGoal[]> {
+    return this.peis.activeGoals(user, t.tenantId);
+  }
 
   @Get('students/:studentId/peis')
   list(

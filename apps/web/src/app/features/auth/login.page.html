@@ -1,0 +1,85 @@
+<main class="auth-layout">
+  <section class="auth-card" aria-labelledby="auth-title">
+    <div class="brand">
+      <mat-icon aria-hidden="true">school</mat-icon>
+      <div>
+        <h1 id="auth-title">PEI</h1>
+        <p class="muted">
+          Planos Educacionais Individualizados, do estudo de caso ao acompanhamento.
+        </p>
+      </div>
+    </div>
+
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Carregando" />
+    }
+    @if (error(); as message) {
+      <p class="alert alert-error" role="alert">{{ message }}</p>
+    }
+    @if (info(); as message) {
+      <p class="alert alert-info" role="status">{{ message }}</p>
+    }
+
+    <mat-tab-group mat-stretch-tabs animationDuration="0ms">
+      <mat-tab label="Entrar">
+        <form class="stack tab-body" (submit)="onLogin($event)" novalidate>
+          <mat-form-field>
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" autocomplete="email" [formField]="login.email" />
+            <mat-error>{{ login.email | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Senha</mat-label>
+            <input
+              matInput
+              type="password"
+              autocomplete="current-password"
+              [formField]="login.password"
+            />
+            <mat-error>{{ login.password | fieldError }}</mat-error>
+          </mat-form-field>
+          <button mat-flat-button type="submit" [disabled]="busy()">Entrar</button>
+        </form>
+      </mat-tab>
+
+      <mat-tab label="Criar conta">
+        <form class="stack tab-body" (submit)="onSignUp($event)" novalidate>
+          <mat-form-field>
+            <mat-label>Nome completo</mat-label>
+            <input matInput autocomplete="name" [formField]="signUp.fullName" />
+            <mat-error>{{ signUp.fullName | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" autocomplete="email" [formField]="signUp.email" />
+            <mat-error>{{ signUp.email | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Senha</mat-label>
+            <input
+              matInput
+              type="password"
+              autocomplete="new-password"
+              [formField]="signUp.password"
+            />
+            <mat-hint>Mínimo de 10 caracteres, com maiúsculas, minúsculas e números</mat-hint>
+            <mat-error>{{ signUp.password | fieldError }}</mat-error>
+          </mat-form-field>
+          <button mat-flat-button type="submit" [disabled]="busy()">Criar conta</button>
+        </form>
+      </mat-tab>
+
+      <mat-tab label="Link por e-mail">
+        <form class="stack tab-body" (submit)="onMagicLink($event)" novalidate>
+          <p class="muted">Sem senha: enviamos um link de acesso para o seu e-mail.</p>
+          <mat-form-field>
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" autocomplete="email" [formField]="magic.email" />
+            <mat-error>{{ magic.email | fieldError }}</mat-error>
+          </mat-form-field>
+          <button mat-flat-button type="submit" [disabled]="busy()">Enviar link</button>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
+  </section>
+</main>

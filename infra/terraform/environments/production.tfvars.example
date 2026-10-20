@@ -1,0 +1,14 @@
+# Copie para production.tfvars (fora do git) e ajuste.
+project_id        = "seu-projeto-gcp"
+environment       = "production"
+github_repository = "beatriz-nascimento/pei"
+
+supabase_url      = "https://SEU-PROJETO-STAGING.supabase.co"
+supabase_anon_key = "sb_publishable_..."
+
+# Na primeira execução use URLs provisórias; depois troque pelos outputs
+# (api_url / web_url) ou pelos seus domínios e rode o apply de novo.
+web_url = "https://pei-production-web-xxxxx.southamerica-east1.run.app"
+api_url = "https://pei-production-api-xxxxx.southamerica-east1.run.app"
+
+api_min_instances = 1

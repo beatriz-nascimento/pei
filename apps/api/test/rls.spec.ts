@@ -52,10 +52,13 @@ beforeAll(async () => {
   viewerA = await newUser('viewer-a');
   adminB = await newUser('admin-b');
 
-  tenantA = (await adminPool.query(`insert into tenants (name, type) values ('A', 'school') returning id`))
-    .rows[0].id;
+  tenantA = (
+    await adminPool.query(`insert into tenants (name, type) values ('A', 'school') returning id`)
+  ).rows[0].id;
   tenantB = (
-    await adminPool.query(`insert into tenants (name, type) values ('B', 'professional') returning id`)
+    await adminPool.query(
+      `insert into tenants (name, type) values ('B', 'professional') returning id`,
+    )
   ).rows[0].id;
   await adminPool.query(
     `insert into memberships (tenant_id, user_id, role) values ($1, $2, 'admin'), ($1, $3, 'viewer'), ($4, $5, 'admin')`,
@@ -126,8 +129,10 @@ describe('RLS', () => {
     const rows = await as(viewerA, async (c) => (await c.query('select id from students')).rows);
     expect(rows.map((r) => r.id)).toEqual([studentA]);
 
-    const updated = await as(viewerA, async (c) =>
-      (await c.query(`update students set notes = 'x' where id = $1`, [studentA])).rowCount,
+    const updated = await as(
+      viewerA,
+      async (c) =>
+        (await c.query(`update students set notes = 'x' where id = $1`, [studentA])).rowCount,
     );
     expect(updated).toBe(0);
 
@@ -143,28 +148,33 @@ describe('RLS', () => {
 
   it('chave composta impede PEI apontando aluno de outra conta', async () => {
     await expect(
-      adminPool.query(`insert into peis (tenant_id, student_id, school_year) values ($1, $2, 2026)`, [
-        tenantB,
-        studentA,
-      ]),
+      adminPool.query(
+        `insert into peis (tenant_id, student_id, school_year) values ($1, $2, 2026)`,
+        [tenantB, studentA],
+      ),
     ).rejects.toThrow(/foreign key/);
   });
 
   it('auditoria só é visível para administradores da própria conta', async () => {
-    const forViewer = await as(viewerA, async (c) => (await c.query('select * from audit_log')).rows);
+    const forViewer = await as(
+      viewerA,
+      async (c) => (await c.query('select * from audit_log')).rows,
+    );
     expect(forViewer).toEqual([]);
     const forAdminB = await as(
       adminB,
-      async (c) =>
-        (await c.query('select * from audit_log where tenant_id = $1', [tenantA])).rows,
+      async (c) => (await c.query('select * from audit_log where tenant_id = $1', [tenantA])).rows,
     );
     expect(forAdminB).toEqual([]);
     const forAdminA = await as(
       adminA,
       async (c) =>
-        (await c.query(`select * from audit_log where tenant_id = $1 and table_name = 'students'`, [
-          tenantA,
-        ])).rows,
+        (
+          await c.query(
+            `select * from audit_log where tenant_id = $1 and table_name = 'students'`,
+            [tenantA],
+          )
+        ).rows,
     );
     expect(forAdminA.length).toBeGreaterThan(0);
   });

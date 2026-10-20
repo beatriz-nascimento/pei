@@ -51,7 +51,13 @@ export const MeasurementMethod = z.enum([
 ]);
 export type MeasurementMethod = z.infer<typeof MeasurementMethod>;
 
-export const MeasurementFrequency = z.enum(['diaria', 'semanal', 'quinzenal', 'mensal', 'bimestral']);
+export const MeasurementFrequency = z.enum([
+  'diaria',
+  'semanal',
+  'quinzenal',
+  'mensal',
+  'bimestral',
+]);
 export type MeasurementFrequency = z.infer<typeof MeasurementFrequency>;
 
 export const AdaptationCategory = z.enum([

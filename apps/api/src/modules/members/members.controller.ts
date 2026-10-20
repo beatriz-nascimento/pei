@@ -105,7 +105,10 @@ export class MembersController {
 
   @Get('invitations')
   @Roles('admin')
-  listInvitations(@CurrentUser() user: AuthUser, @Tenant() t: TenantContext): Promise<Invitation[]> {
+  listInvitations(
+    @CurrentUser() user: AuthUser,
+    @Tenant() t: TenantContext,
+  ): Promise<Invitation[]> {
     return this.db.asUser(user, async (trx) => {
       const rows = await trx
         .selectFrom('invitations')
@@ -173,7 +176,11 @@ export class MembersController {
     @Param('invitationId', UuidPipe) id: string,
   ): Promise<void> {
     await this.db.asUser(user, (trx) =>
-      trx.deleteFrom('invitations').where('tenantId', '=', t.tenantId).where('id', '=', id).execute(),
+      trx
+        .deleteFrom('invitations')
+        .where('tenantId', '=', t.tenantId)
+        .where('id', '=', id)
+        .execute(),
     );
   }
 }

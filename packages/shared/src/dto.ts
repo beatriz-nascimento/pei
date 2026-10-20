@@ -77,6 +77,7 @@ export interface Student extends StudentSummary {
   notes: string | null;
   guardians: GuardianInput[];
   staff: StudentStaff[];
+  archivedAt: string | null;
   createdAt: string;
 }
 
@@ -182,4 +183,13 @@ export interface ApiErrorBody {
 export interface Page<T> {
   items: T[];
   total: number;
+}
+
+/** Meta de um PEI em vigor, para a tela de registro rápido de progresso. */
+export interface ActiveGoal {
+  studentId: string;
+  studentName: string;
+  peiId: string;
+  canEdit: boolean;
+  goal: Goal;
 }

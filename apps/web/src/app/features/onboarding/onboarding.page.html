@@ -1,0 +1,47 @@
+<main class="page onboarding">
+  <header class="page-header">
+    <h1>Vamos criar sua conta</h1>
+    <button mat-button (click)="signOut()">Sair</button>
+  </header>
+
+  <form class="stack" (submit)="create($event)" novalidate>
+    <fieldset class="types">
+      <legend>Tipo de conta</legend>
+      @for (t of types; track t.value) {
+        <button
+          type="button"
+          class="type-card"
+          [class.selected]="model().type === t.value"
+          [attr.aria-pressed]="model().type === t.value"
+          (click)="choose(t.value)"
+        >
+          <mat-icon aria-hidden="true">{{ t.icon }}</mat-icon>
+          <span class="type-title">{{ t.title }}</span>
+          <span class="muted">{{ t.text }}</span>
+        </button>
+      }
+    </fieldset>
+
+    <div class="surface-card stack">
+      <mat-form-field>
+        <mat-label>{{
+          model().type === 'school' ? 'Nome da escola' : 'Seu nome profissional'
+        }}</mat-label>
+        <input matInput [formField]="f.name" />
+        <mat-error>{{ f.name | fieldError }}</mat-error>
+      </mat-form-field>
+      <div class="row">
+        <mat-form-field>
+          <mat-label>Cidade</mat-label>
+          <input matInput [formField]="f.city" autocomplete="address-level2" />
+        </mat-form-field>
+        <mat-form-field class="uf">
+          <mat-label>UF</mat-label>
+          <input matInput [formField]="f.state" autocomplete="address-level1" />
+          <mat-error>{{ f.state | fieldError }}</mat-error>
+        </mat-form-field>
+      </div>
+      <button mat-flat-button type="submit" [disabled]="busy()">Criar conta</button>
+    </div>
+  </form>
+</main>

@@ -152,7 +152,11 @@ export class StudentsService {
   /** Exclusão definitiva (direito de eliminação, LGPD art. 18). Apaga PEIs e registros em cascata. */
   async remove(user: AuthUser, tenantId: string, id: string): Promise<void> {
     const res = await this.db.asUser(user, (trx) =>
-      trx.deleteFrom('students').where('tenantId', '=', tenantId).where('id', '=', id).executeTakeFirst(),
+      trx
+        .deleteFrom('students')
+        .where('tenantId', '=', tenantId)
+        .where('id', '=', id)
+        .executeTakeFirst(),
     );
     if (res.numDeletedRows === 0n) throw new NotFoundException('Aluno não encontrado');
   }
@@ -234,6 +238,7 @@ export class StudentsService {
         email: m.email,
         function: StaffFunction.parse(m.function),
       })),
+      archivedAt: s.archivedAt ? toIso(s.archivedAt) : null,
       createdAt: toIso(s.createdAt),
       updatedAt: toIso(s.updatedAt),
     };

@@ -1,0 +1,140 @@
+<main class="portal">
+  @if (view.isLoading() && !view.hasValue()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Carregando" />
+  }
+
+  @if (view.error()) {
+    <section class="card center" role="alert">
+      <mat-icon>link_off</mat-icon>
+      <h1>Link indisponível</h1>
+      <p class="muted">
+        Este link expirou ou foi desativado. Peça um novo link à escola ou ao profissional.
+      </p>
+    </section>
+  }
+
+  @if (view.value(); as v) {
+    <header class="portal-header">
+      <p class="muted">{{ v.tenantName }}</p>
+      <h1>Acompanhamento de {{ v.student.firstName }}</h1>
+      <p class="muted">
+        {{ v.student.grade || '' }}{{ v.student.schoolName ? ' · ' + v.student.schoolName : '' }}
+      </p>
+    </header>
+
+    @if (v.consent.required) {
+      <section class="card" aria-labelledby="consent-title">
+        <h2 id="consent-title">Termo de consentimento</h2>
+        <div class="terms">
+          <p>
+            Este portal mostra o Plano Educacional Individualizado (PEI) de
+            {{ v.student.firstName }}: metas, adaptações, serviços e a evolução registrada pela
+            equipe.
+          </p>
+          <p>
+            Os dados são tratados por {{ v.tenantName }} somente para o planejamento e
+            acompanhamento educacional, conforme a Lei Geral de Proteção de Dados (LGPD). O acesso é
+            somente leitura e cada visita fica registrada. Você pode pedir informações, correção ou
+            exclusão dos dados diretamente à instituição.
+          </p>
+          <p class="muted small">Versão do termo: {{ v.consent.termsVersion }}</p>
+        </div>
+        <form class="stack" (submit)="accept($event)" novalidate>
+          <div class="row">
+            <mat-form-field>
+              <mat-label>Seu nome</mat-label>
+              <input matInput autocomplete="name" [formField]="consent.guardianName" />
+              <mat-error>{{ consent.guardianName | fieldError }}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Parentesco</mat-label>
+              <input
+                matInput
+                [formField]="consent.relationship"
+                placeholder="Mãe, pai, responsável legal…"
+              />
+              <mat-error>{{ consent.relationship | fieldError }}</mat-error>
+            </mat-form-field>
+          </div>
+          <mat-checkbox [formField]="consent.accepted">
+            Sou responsável legal por {{ v.student.firstName }}, li e aceito o termo.
+          </mat-checkbox>
+          @if (consent.accepted | fieldError; as err) {
+            <p class="error" role="alert">{{ err }}</p>
+          }
+          <button mat-flat-button type="submit" [disabled]="busy()">
+            Aceitar e ver o acompanhamento
+          </button>
+        </form>
+      </section>
+    } @else {
+      @for (p of peis(); track p.id) {
+        <section class="card" [attr.aria-label]="'PEI ' + p.schoolYear">
+          <div class="pei-title">
+            <h2>PEI {{ p.schoolYear }}</h2>
+            <span class="badge" [class.badge-active]="p.status === 'active'">{{
+              p.status | label: 'peiStatus'
+            }}</span>
+          </div>
+          <p class="muted">
+            Vigência: {{ p.startDate ? (p.startDate | date: 'dd/MM/yyyy') : '—' }} a
+            {{ p.reviewDate ? (p.reviewDate | date: 'dd/MM/yyyy') : '—' }}
+          </p>
+
+          <h3>Metas</h3>
+          @for (g of p.goals; track g.id; let i = $index) {
+            <article class="goal">
+              <div class="goal-head">
+                <span class="badge">{{ g.area | label: 'developmentArea' }}</span>
+                <span class="badge" [class.badge-active]="g.status === 'achieved'">{{
+                  g.status | label: 'goalStatus'
+                }}</span>
+              </div>
+              <h4>{{ i + 1 }}. {{ g.description }}</h4>
+              <p class="muted">
+                Como saberemos que deu certo: {{ g.successCriterion }} · até
+                {{ g.targetDate | date: 'dd/MM/yyyy' }}
+              </p>
+              <app-progress-history [entries]="g.progress" />
+            </article>
+          } @empty {
+            <p class="muted">Sem metas cadastradas.</p>
+          }
+
+          @if (p.adaptations.length) {
+            <h3>Adaptações</h3>
+            <ul>
+              @for (a of p.adaptations; track $index) {
+                <li>
+                  <strong>{{ a.category | label: 'adaptationCategory' }}:</strong>
+                  {{ a.description }}
+                </li>
+              }
+            </ul>
+          }
+
+          @if (p.services.length) {
+            <h3>Atendimentos</h3>
+            <ul>
+              @for (s of p.services; track $index) {
+                <li>
+                  <strong>{{ s.type | label: 'serviceType' }}</strong>
+                  {{ s.frequency ? ' · ' + s.frequency : ''
+                  }}{{ s.location ? ' · ' + s.location : '' }}
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      } @empty {
+        <section class="card center">
+          <mat-icon>hourglass_empty</mat-icon>
+          <p>O PEI ainda está em elaboração. Volte em breve.</p>
+        </section>
+      }
+      <p class="muted small footer">
+        Acesso somente leitura. Dúvidas? Fale com a equipe da escola.
+      </p>
+    }
+  }
+</main>

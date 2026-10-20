@@ -1,0 +1,114 @@
+<h2 mat-dialog-title>{{ data.student ? 'Editar aluno' : 'Novo aluno' }}</h2>
+<form (submit)="save($event)" novalidate>
+  <mat-dialog-content class="stack">
+    <mat-form-field>
+      <mat-label>Nome completo</mat-label>
+      <input matInput [formField]="f.fullName" cdkFocusInitial />
+      <mat-error>{{ f.fullName | fieldError }}</mat-error>
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field>
+        <mat-label>Data de nascimento</mat-label>
+        <input matInput type="date" [formField]="f.birthDate" />
+        <mat-error>{{ f.birthDate | fieldError }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Ano/série</mat-label>
+        <input matInput [formField]="f.grade" placeholder="Ex.: 3º ano" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Turma</mat-label>
+        <input matInput [formField]="f.classGroup" />
+      </mat-form-field>
+    </div>
+
+    @if (isProfessional) {
+      <mat-form-field>
+        <mat-label>Escola do aluno</mat-label>
+        <input matInput [formField]="f.schoolName" />
+        <mat-hint>Contas Profissional atendem alunos de escolas diferentes</mat-hint>
+      </mat-form-field>
+    }
+
+    <mat-form-field>
+      <mat-label>Condições informadas</mat-label>
+      <mat-chip-grid #chips aria-label="Condições">
+        @for (c of model().conditions; track c) {
+          <mat-chip-row (removed)="removeCondition(c)">
+            {{ c }}
+            <button matChipRemove [attr.aria-label]="'Remover ' + c">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+        }
+        <input
+          placeholder="Digite e tecle Enter"
+          [matChipInputFor]="chips"
+          (matChipInputTokenEnd)="onChipInput($event)"
+        />
+      </mat-chip-grid>
+      <mat-hint>Dado de saúde: registre só o que for necessário para o PEI</mat-hint>
+    </mat-form-field>
+    <div class="suggestions" aria-label="Sugestões">
+      @for (s of suggestions; track s) {
+        @if (!model().conditions.includes(s)) {
+          <button mat-stroked-button type="button" (click)="addCondition(s)">+ {{ s }}</button>
+        }
+      }
+    </div>
+
+    <mat-form-field>
+      <mat-label>Observações</mat-label>
+      <textarea matInput rows="3" [formField]="f.notes"></textarea>
+    </mat-form-field>
+
+    <h3>Responsáveis (família)</h3>
+    @for (g of f.guardians; track $index; let i = $index) {
+      <div class="guardian stack">
+        <div class="guardian-header">
+          <strong>Responsável {{ i + 1 }}</strong>
+          <button
+            mat-icon-button
+            type="button"
+            (click)="removeGuardian(i)"
+            aria-label="Remover responsável"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        <div class="row">
+          <mat-form-field>
+            <mat-label>Nome</mat-label>
+            <input matInput [formField]="g.name" />
+            <mat-error>{{ g.name | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Parentesco</mat-label>
+            <input matInput [formField]="g.relationship" placeholder="Mãe, pai, avó…" />
+            <mat-error>{{ g.relationship | fieldError }}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field>
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" [formField]="g.email" />
+            <mat-error>{{ g.email | fieldError }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Telefone</mat-label>
+            <input matInput type="tel" [formField]="g.phone" />
+          </mat-form-field>
+        </div>
+      </div>
+    }
+    <button mat-stroked-button type="button" (click)="addGuardian()">
+      <mat-icon>person_add</mat-icon> Adicionar responsável
+    </button>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="busy()">Salvar</button>
+  </mat-dialog-actions>
+</form>

@@ -7,7 +7,10 @@ import { ErrorsFilter } from './common/errors.filter.js';
 import { ENV, type Env } from './config/env.js';
 import { DbModule } from './db/db.module.js';
 import { ExportService } from './modules/exports/export.service.js';
-import { FamilyLinksController, FamilyPortalController } from './modules/family/family.controller.js';
+import {
+  FamilyLinksController,
+  FamilyPortalController,
+} from './modules/family/family.controller.js';
 import { HealthController } from './modules/health/health.controller.js';
 import { MeController } from './modules/me/me.controller.js';
 import { InvitationsController, MembersController } from './modules/members/members.controller.js';

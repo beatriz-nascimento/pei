@@ -26,7 +26,11 @@ function blockToContent(block: Block): Content {
     case 'heading':
       return { text: block.text, style: 'h2' };
     case 'paragraph':
-      return { text: block.text, color: block.muted ? COLORS.muted : undefined, margin: [0, 0, 0, 6] };
+      return {
+        text: block.text,
+        color: block.muted ? COLORS.muted : undefined,
+        margin: [0, 0, 0, 6],
+      };
     case 'fields':
       return {
         table: {

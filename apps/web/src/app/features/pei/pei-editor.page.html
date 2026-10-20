@@ -1,0 +1,122 @@
+<div class="page">
+  @if (resource.isLoading() && !resource.hasValue()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Carregando PEI" />
+  }
+  @if (resource.error()) {
+    <div class="empty-state" role="alert">
+      <mat-icon>search_off</mat-icon>
+      <p>PEI não encontrado ou sem acesso.</p>
+    </div>
+  }
+
+  @if (resource.value(); as pei) {
+    <a mat-button [routerLink]="['/t', session.tenantId(), 'alunos', pei.studentId]" class="back">
+      <mat-icon>arrow_back</mat-icon> {{ pei.student.fullName }}
+    </a>
+
+    <header class="pei-header">
+      <div class="title">
+        <h1>PEI {{ pei.schoolYear }} · versão {{ pei.version }}</h1>
+        <p class="muted">
+          <span
+            class="badge"
+            [class.badge-active]="pei.status === 'active'"
+            [class.badge-draft]="pei.status === 'draft'"
+          >
+            {{ pei.status | label: 'peiStatus' }}
+          </span>
+          Vigência: {{ pei.startDate ? (pei.startDate | date: 'dd/MM/yyyy') : '—' }} a
+          {{ pei.reviewDate ? (pei.reviewDate | date: 'dd/MM/yyyy') : '—' }}
+          @if (!pei.canEdit) {
+            · <mat-icon inline>visibility</mat-icon> somente leitura
+          }
+        </p>
+      </div>
+
+      <div class="actions">
+        <button mat-stroked-button [matMenuTriggerFor]="exportMenu" [disabled]="!!exporting()">
+          <mat-icon>download</mat-icon> {{ exporting() ? 'Gerando…' : 'Documento' }}
+        </button>
+        <mat-menu #exportMenu="matMenu">
+          <button mat-menu-item (click)="export('pdf')">
+            <mat-icon>picture_as_pdf</mat-icon><span>PDF</span>
+          </button>
+          <button mat-menu-item (click)="export('docx')">
+            <mat-icon>description</mat-icon><span>Word (.docx)</span>
+          </button>
+        </mat-menu>
+
+        @if (pei.canEdit && pei.status === 'draft') {
+          <button
+            mat-flat-button
+            (click)="changeStatus('active')"
+            [disabled]="busy() || pei.goals.length === 0"
+          >
+            <mat-icon>check_circle</mat-icon> Colocar em vigor
+          </button>
+        }
+        @if (session.canEdit()) {
+          <button mat-icon-button [matMenuTriggerFor]="more" aria-label="Mais ações">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #more="matMenu">
+            @if (pei.status !== 'draft') {
+              <button mat-menu-item (click)="newVersion(pei)">
+                <mat-icon>content_copy</mat-icon><span>Nova versão</span>
+              </button>
+            }
+            @if (pei.canEdit && pei.status === 'active') {
+              <button mat-menu-item (click)="changeStatus('archived')">
+                <mat-icon>archive</mat-icon><span>Arquivar</span>
+              </button>
+            }
+            @if (pei.canEdit && pei.status === 'draft') {
+              <button mat-menu-item (click)="remove(pei)">
+                <mat-icon>delete</mat-icon><span>Excluir rascunho</span>
+              </button>
+            }
+          </mat-menu>
+        }
+      </div>
+    </header>
+
+    @if (pei.status === 'draft' && pei.canEdit) {
+      <section class="checklist" aria-label="O que falta para colocar em vigor">
+        @for (item of checklist(); track item.label) {
+          <span class="check" [class.done]="item.done">
+            <mat-icon inline>{{ item.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            {{ item.label }}
+          </span>
+        }
+      </section>
+    }
+
+    <mat-tab-group
+      class="pei-tabs"
+      mat-stretch-tabs="false"
+      animationDuration="0ms"
+      preserveContent
+    >
+      <mat-tab label="Estudo de caso">
+        <div class="tab-body"><app-case-study-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+      </mat-tab>
+      <mat-tab label="Linha de base">
+        <div class="tab-body"><app-baseline-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+      </mat-tab>
+      <mat-tab [label]="'Metas (' + pei.goals.length + ')'">
+        <div class="tab-body"><app-goals-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+      </mat-tab>
+      <mat-tab label="Acompanhamento">
+        <ng-template matTabContent>
+          <div class="tab-body"><app-progress-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Adaptações">
+        <div class="tab-body"><app-adaptations-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+      </mat-tab>
+      <mat-tab label="Serviços">
+        <div class="tab-body"><app-services-tab [pei]="pei" (saved)="onSaved($event)" /></div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

@@ -49,7 +49,11 @@ export class MeController {
     @Body(new ZodPipe(UpdateMeInput)) body: z.infer<typeof UpdateMeInput>,
   ): Promise<Me> {
     await this.db.asUser(user, (trx) =>
-      trx.updateTable('profiles').set({ fullName: body.fullName }).where('id', '=', user.id).execute(),
+      trx
+        .updateTable('profiles')
+        .set({ fullName: body.fullName })
+        .where('id', '=', user.id)
+        .execute(),
     );
     return this.get(user);
   }

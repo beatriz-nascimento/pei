@@ -17,6 +17,9 @@ import {
 const text = (max: number) => z.string().trim().max(max);
 const requiredText = (max: number) => z.string().trim().min(1, 'Campo obrigatório').max(max);
 const isoDate = z.iso.date();
+/** Datas opcionais vindas de formulário: string vazia vira "não informado". */
+const optionalDate = z.union([isoDate, z.literal('').transform(() => undefined)]).optional();
+const nullableDate = z.union([isoDate, z.literal('').transform(() => null)]).nullable();
 
 /* -------------------------------------------------------------------------- */
 /* Conta (tenant), membros e convites                                         */
@@ -27,10 +30,14 @@ export const CreateTenantInput = z.object({
   type: AccountType,
   city: text(120).optional(),
   state: z
-    .string()
-    .trim()
-    .length(2)
-    .transform((s) => s.toUpperCase())
+    .union([
+      z
+        .string()
+        .trim()
+        .length(2, 'Use a sigla com 2 letras (ex.: PR)')
+        .transform((s) => s.toUpperCase()),
+      z.literal('').transform(() => undefined),
+    ])
     .optional(),
 });
 export type CreateTenantInput = z.infer<typeof CreateTenantInput>;
@@ -64,7 +71,7 @@ export type GuardianInput = z.infer<typeof GuardianInput>;
 
 export const CreateStudentInput = z.object({
   fullName: requiredText(160),
-  birthDate: isoDate.optional(),
+  birthDate: optionalDate,
   /** Escola de origem — relevante para contas Profissional, que atendem alunos de várias escolas. */
   schoolName: text(160).optional(),
   grade: text(60).optional(),
@@ -120,15 +127,15 @@ export const Service = z.object({
   type: ServiceType,
   provider: text(160).default(''),
   frequency: text(120).default(''),
-  durationMinutes: z.number().int().min(0).max(600).optional(),
+  durationMinutes: z.number().int().min(0).max(600).nullish(),
   location: text(160).default(''),
 });
 export type Service = z.infer<typeof Service>;
 
 export const CreatePeiInput = z.object({
   schoolYear: z.number().int().min(2020).max(2100),
-  startDate: isoDate.optional(),
-  reviewDate: isoDate.optional(),
+  startDate: optionalDate,
+  reviewDate: optionalDate,
   /** Quando informado, copia as abas e metas de um PEI anterior do mesmo aluno (nova versão). */
   copyFromPeiId: z.uuid().optional(),
 });
@@ -136,8 +143,8 @@ export type CreatePeiInput = z.infer<typeof CreatePeiInput>;
 
 export const UpdatePeiInput = z
   .object({
-    startDate: isoDate.nullable(),
-    reviewDate: isoDate.nullable(),
+    startDate: nullableDate,
+    reviewDate: nullableDate,
     caseStudy: CaseStudy,
     baseline: z.array(BaselineEntry).max(20),
     adaptations: z.array(Adaptation).max(50),
@@ -164,6 +171,7 @@ export const GoalInput = z.object({
   bnccCode: z
     .string()
     .trim()
+    .toUpperCase()
     .regex(
       /^(E[IF]\d{2}[A-Z]{2}\d{2}|EM\d{2}[A-Z]{3}\d{3})$/,
       'Código BNCC inválido (ex.: EF01LP02, EI03EO01, EM13LGG101)',

@@ -178,7 +178,10 @@ export function buildPeiDocument({ pei, student, tenantName, generatedAt }: DocI
           role: LABELS.staffFunction[s.function],
         })),
         ...(student.guardians.length
-          ? student.guardians.map((g) => ({ name: g.name, role: `Responsável — ${g.relationship}` }))
+          ? student.guardians.map((g) => ({
+              name: g.name,
+              role: `Responsável — ${g.relationship}`,
+            }))
           : [{ name: '', role: 'Responsável legal' }]),
         { name: '', role: 'Coordenação / Direção' },
       ],

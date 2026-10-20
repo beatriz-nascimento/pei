@@ -1,0 +1,216 @@
+<div class="page">
+  <a mat-button [routerLink]="['/t', session.tenantId(), 'alunos']" class="back">
+    <mat-icon>arrow_back</mat-icon> Alunos
+  </a>
+
+  @if (student.isLoading() && !student.hasValue()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Carregando aluno" />
+  }
+  @if (student.error()) {
+    <div class="empty-state" role="alert">
+      <mat-icon>search_off</mat-icon>
+      <p>Aluno não encontrado ou sem acesso.</p>
+    </div>
+  }
+
+  @if (student.value(); as s) {
+    <header class="page-header">
+      <h1>
+        {{ s.fullName }}
+        @if (s.archivedAt) {
+          <span class="badge">Arquivado</span>
+        }
+      </h1>
+      @if (session.canEdit()) {
+        <button mat-stroked-button (click)="edit(s)"><mat-icon>edit</mat-icon> Editar</button>
+      }
+      @if (session.isAdmin()) {
+        <button mat-icon-button [matMenuTriggerFor]="more" aria-label="Mais ações">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #more="matMenu">
+          <button mat-menu-item (click)="toggleArchive(s)">
+            <mat-icon>{{ s.archivedAt ? 'unarchive' : 'archive' }}</mat-icon>
+            <span>{{ s.archivedAt ? 'Reativar' : 'Arquivar' }}</span>
+          </button>
+          <button mat-menu-item (click)="remove(s)">
+            <mat-icon>delete_forever</mat-icon>
+            <span>Excluir definitivamente</span>
+          </button>
+        </mat-menu>
+      }
+    </header>
+
+    <div class="grid">
+      <!-- PEIs -->
+      <section class="surface-card span-2" aria-labelledby="peis-title">
+        <div class="card-header">
+          <h2 id="peis-title">PEIs</h2>
+          @if (session.canEdit()) {
+            <button mat-flat-button (click)="newPei()"><mat-icon>add</mat-icon> Novo PEI</button>
+          }
+        </div>
+        @if (peis.value()?.length) {
+          <mat-nav-list>
+            @for (p of peis.value(); track p.id) {
+              <a mat-list-item [routerLink]="['/t', session.tenantId(), 'peis', p.id]" lines="2">
+                <mat-icon matListItemIcon>description</mat-icon>
+                <span matListItemTitle>PEI {{ p.schoolYear }} · versão {{ p.version }}</span>
+                <span matListItemLine class="muted">
+                  {{ p.goalCount }} {{ p.goalCount === 1 ? 'meta' : 'metas' }} · atualizado em
+                  {{ p.updatedAt | date: 'dd/MM/yyyy' }}
+                </span>
+                <span matListItemMeta class="meta">
+                  <span
+                    class="badge"
+                    [class.badge-active]="p.status === 'active'"
+                    [class.badge-draft]="p.status === 'draft'"
+                  >
+                    {{ p.status | label: 'peiStatus' }}
+                  </span>
+                </span>
+              </a>
+            }
+          </mat-nav-list>
+        } @else if (!peis.isLoading()) {
+          <p class="muted">Nenhum PEI ainda. Comece criando o primeiro.</p>
+        }
+      </section>
+
+      <!-- Dados do aluno -->
+      <section class="surface-card" aria-labelledby="info-title">
+        <h2 id="info-title">Dados</h2>
+        <dl class="facts">
+          <dt>Nascimento</dt>
+          <dd>{{ s.birthDate ? (s.birthDate | date: 'dd/MM/yyyy') : '—' }}</dd>
+          <dt>Série · Turma</dt>
+          <dd>{{ s.grade || '—' }} · {{ s.classGroup || '—' }}</dd>
+          @if (s.schoolName) {
+            <dt>Escola</dt>
+            <dd>{{ s.schoolName }}</dd>
+          }
+          <dt>Condições</dt>
+          <dd>
+            @for (c of s.conditions; track c) {
+              <span class="badge">{{ c }}</span>
+            } @empty {
+              —
+            }
+          </dd>
+          @if (s.notes) {
+            <dt>Observações</dt>
+            <dd class="pre">{{ s.notes }}</dd>
+          }
+          <dt>Responsáveis</dt>
+          <dd>
+            @for (g of s.guardians; track $index) {
+              <div>
+                {{ g.name }} ({{ g.relationship }}){{ g.email ? ' · ' + g.email : ''
+                }}{{ g.phone ? ' · ' + g.phone : '' }}
+              </div>
+            } @empty {
+              —
+            }
+          </dd>
+        </dl>
+      </section>
+
+      <!-- Equipe -->
+      <section class="surface-card" aria-labelledby="staff-title">
+        <h2 id="staff-title">Equipe responsável</h2>
+        <mat-list>
+          @for (m of s.staff; track m.userId) {
+            <mat-list-item lines="2">
+              <mat-icon matListItemIcon>person</mat-icon>
+              <span matListItemTitle>{{ m.fullName || m.email }}</span>
+              <span matListItemLine class="muted">{{ m.function | label: 'staffFunction' }}</span>
+              @if (session.isAdmin()) {
+                <button
+                  matListItemMeta
+                  mat-icon-button
+                  (click)="removeStaff(m.userId)"
+                  [attr.aria-label]="'Desvincular ' + (m.fullName || m.email)"
+                >
+                  <mat-icon>link_off</mat-icon>
+                </button>
+              }
+            </mat-list-item>
+          } @empty {
+            <p class="muted">Ninguém vinculado ainda.</p>
+          }
+        </mat-list>
+
+        @if (session.isAdmin()) {
+          <div class="add-staff">
+            <mat-form-field subscriptSizing="dynamic">
+              <mat-label>Profissional</mat-label>
+              <mat-select [value]="newStaffUser()" (valueChange)="newStaffUser.set($event)">
+                @for (m of availableMembers(); track m.userId) {
+                  <mat-option [value]="m.userId">{{ m.fullName || m.email }}</mat-option>
+                } @empty {
+                  <mat-option disabled>Todos já vinculados — convide em Equipe</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field subscriptSizing="dynamic">
+              <mat-label>Função</mat-label>
+              <mat-select [value]="newStaffFunction()" (valueChange)="newStaffFunction.set($event)">
+                @for (o of staffFunctions; track o[0]) {
+                  <mat-option [value]="o[0]">{{ o[1] }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button mat-stroked-button (click)="addStaff()" [disabled]="!newStaffUser()">
+              Vincular
+            </button>
+          </div>
+        }
+      </section>
+
+      <!-- Família -->
+      <section class="surface-card span-2" aria-labelledby="family-title">
+        <div class="card-header">
+          <h2 id="family-title">Portal da família</h2>
+          @if (session.canEdit()) {
+            <button mat-stroked-button (click)="newFamilyLink(s)">
+              <mat-icon>share</mat-icon> Gerar link
+            </button>
+          }
+        </div>
+        <p class="muted">
+          A família acompanha metas e evolução por um link, sem cadastro e somente leitura. Antes de
+          ver os dados, aceita o termo de consentimento (LGPD).
+        </p>
+        @for (l of links.value(); track l.id) {
+          <div class="link-row">
+            <mat-icon>{{ linkState(l) === 'active' ? 'link' : 'link_off' }}</mat-icon>
+            <div class="grow">
+              <div>{{ l.label || 'Link da família' }}</div>
+              <div class="muted small">
+                Criado em {{ l.createdAt | date: 'dd/MM/yyyy' }} ·
+                @switch (linkState(l)) {
+                  @case ('revoked') {
+                    revogado
+                  }
+                  @case ('expired') {
+                    expirou em {{ l.expiresAt | date: 'dd/MM/yyyy' }}
+                  }
+                  @default {
+                    vale até {{ l.expiresAt | date: 'dd/MM/yyyy' }}
+                  }
+                }
+                · {{ l.accessCount }} {{ l.accessCount === 1 ? 'acesso' : 'acessos' }}
+                @if (l.lastAccessAt) {
+                  (último em {{ l.lastAccessAt | date: 'dd/MM/yyyy HH:mm' }})
+                }
+              </div>
+            </div>
+            @if (linkState(l) === 'active' && session.canEdit()) {
+              <button mat-button (click)="revokeLink(l)">Revogar</button>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

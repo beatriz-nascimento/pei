@@ -1,0 +1,112 @@
+<div class="page">
+  <header class="page-header">
+    <h1>Equipe</h1>
+  </header>
+
+  <ul class="roles muted">
+    <li>
+      <strong>Administrador:</strong> gerencia a equipe, cadastra alunos e vê todos os PEIs da
+      conta.
+    </li>
+    <li>
+      <strong>Edita PEI:</strong> edita os PEIs e registra o progresso dos alunos aos quais está
+      vinculado.
+    </li>
+    <li><strong>Só leitura:</strong> consulta os alunos aos quais está vinculado.</li>
+  </ul>
+
+  <section class="surface-card" aria-labelledby="invite-title">
+    <h2 id="invite-title">Convidar profissional</h2>
+    <form class="invite" (submit)="sendInvite($event)" novalidate>
+      <mat-form-field>
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" [formField]="invite.email" />
+        <mat-error>{{ invite.email | fieldError }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Papel</mat-label>
+        <mat-select [formField]="invite.role">
+          @for (r of roles; track r[0]) {
+            <mat-option [value]="r[0]">{{ r[1] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-flat-button type="submit" [disabled]="busy()">
+        <mat-icon>send</mat-icon> Gerar convite
+      </button>
+    </form>
+
+    @if (invitations.value()?.length) {
+      <h3>Convites pendentes</h3>
+      <table mat-table [dataSource]="invitations.value()!">
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>E-mail</th>
+          <td mat-cell *matCellDef="let i">{{ i.email }}</td>
+        </ng-container>
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>Papel</th>
+          <td mat-cell *matCellDef="let i">{{ i.role | label: 'memberRole' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="expires">
+          <th mat-header-cell *matHeaderCellDef>Expira</th>
+          <td mat-cell *matCellDef="let i">{{ i.expiresAt | date: 'dd/MM/yyyy' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Ações</span></th>
+          <td mat-cell *matCellDef="let i">
+            <button mat-button (click)="revoke(i)">Cancelar</button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['email', 'role', 'expires', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['email', 'role', 'expires', 'actions']"></tr>
+      </table>
+    }
+  </section>
+
+  <section class="surface-card" aria-labelledby="members-title">
+    <h2 id="members-title">Membros</h2>
+    <table mat-table [dataSource]="members.value() ?? []">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let m">
+          <div>{{ m.fullName || '—' }}</div>
+          <div class="muted">{{ m.email }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Papel</th>
+        <td mat-cell *matCellDef="let m">
+          <mat-form-field class="role-select" subscriptSizing="dynamic">
+            <mat-select
+              [value]="m.role"
+              (valueChange)="changeRole(m, $event)"
+              [attr.aria-label]="'Papel de ' + (m.fullName || m.email)"
+            >
+              @for (r of roles; track r[0]) {
+                <mat-option [value]="r[0]">{{ r[1] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="since">
+        <th mat-header-cell *matHeaderCellDef>Desde</th>
+        <td mat-cell *matCellDef="let m">{{ m.joinedAt | date: 'dd/MM/yyyy' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef><span class="visually-hidden">Ações</span></th>
+        <td mat-cell *matCellDef="let m">
+          <button
+            mat-icon-button
+            (click)="removeMember(m)"
+            [attr.aria-label]="'Remover ' + (m.fullName || m.email)"
+          >
+            <mat-icon>person_remove</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['name', 'role', 'since', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'role', 'since', 'actions']"></tr>
+    </table>
+  </section>
+</div>

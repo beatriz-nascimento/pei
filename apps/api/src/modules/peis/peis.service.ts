@@ -17,6 +17,7 @@ import {
   Service,
   SupportType,
   type CreatePeiInput,
+  type ActiveGoal,
   type Goal,
   type GoalData,
   type Pei,
@@ -143,7 +144,9 @@ export class PeisService {
           version: (maxVersion ?? 0) + 1,
           startDate: input.startDate ?? null,
           reviewDate: input.reviewDate ?? null,
-          caseStudy: JSON.stringify(source ? CaseStudyJson.parse(source.caseStudy) : CaseStudy.parse({})),
+          caseStudy: JSON.stringify(
+            source ? CaseStudyJson.parse(source.caseStudy) : CaseStudy.parse({}),
+          ),
           baseline: JSON.stringify(source ? BaselineJson.parse(source.baseline) : []),
           adaptations: JSON.stringify(source ? AdaptationsJson.parse(source.adaptations) : []),
           services: JSON.stringify(source ? ServicesJson.parse(source.services) : []),
@@ -208,7 +211,9 @@ export class PeisService {
           .where('peiId', '=', peiId)
           .executeTakeFirstOrThrow();
         if (Number(goals.n) === 0) {
-          throw new ConflictException('Cadastre pelo menos uma meta antes de colocar o PEI em vigor');
+          throw new ConflictException(
+            'Cadastre pelo menos uma meta antes de colocar o PEI em vigor',
+          );
         }
         // O PEI anterior em vigor vira histórico.
         await trx
@@ -420,6 +425,36 @@ export class PeisService {
     });
   }
 
+  /** Metas dos PEIs em vigor que o usuário enxerga (registro rápido no celular). */
+  activeGoals(user: AuthUser, tenantId: string): Promise<ActiveGoal[]> {
+    return this.db.asUser(user, async (trx) => {
+      const rows = await this.goalsQuery(trx)
+        .innerJoin('peis as p', 'p.id', 'g.peiId')
+        .innerJoin('students as s', 's.id', 'g.studentId')
+        .select([
+          's.fullName as studentName',
+          sql<boolean>`exists (select 1 from private.editable_student_ids() e where e = g.student_id)`.as(
+            'canEdit',
+          ),
+        ])
+        .where('g.tenantId', '=', tenantId)
+        .where('p.status', '=', 'active')
+        .where('s.archivedAt', 'is', null)
+        .where('g.status', 'in', ['not_started', 'in_progress'])
+        .clearOrderBy()
+        .orderBy('s.fullName')
+        .orderBy('g.position')
+        .execute();
+      return rows.map((r) => ({
+        studentId: r.studentId,
+        studentName: r.studentName,
+        peiId: r.peiId,
+        canEdit: r.canEdit,
+        goal: toGoal(r),
+      }));
+    });
+  }
+
   /* ------------------------------------------------------------------------ */
   /* Leitura e checagens                                                      */
   /* ------------------------------------------------------------------------ */
@@ -475,7 +510,12 @@ export class PeisService {
           .as('progressCount'),
         eb
           .selectFrom('progressEntries as e')
-          .select(sql<{ level: string; observedAt: string }>`json_build_object('level', e.level, 'observedAt', e.observed_at)`.as('last'))
+          .select(
+            sql<{
+              level: string;
+              observedAt: string;
+            }>`json_build_object('level', e.level, 'observedAt', e.observed_at)`.as('last'),
+          )
           .whereRef('e.goalId', '=', 'g.id')
           .orderBy('e.observedAt', 'desc')
           .limit(1)
