@@ -45,7 +45,15 @@ html {
     );
   }
 
-  @include mat.form-field-density(mat.define-theme((density: (scale: theme.$form-field-density))));
+  @include mat.form-field-density(
+    mat.define-theme(
+      (
+        density: (
+          scale: theme.$form-field-density,
+        ),
+      )
+    )
+  );
 
   --pei-level-not-observed: #{theme.$level-not-observed};
   --pei-level-emerging: #{theme.$level-emerging};

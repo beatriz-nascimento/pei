@@ -104,3 +104,4 @@ publica em homologação, e produção sai por execução manual do workflow **D
 - [docs/arquitetura.md](docs/arquitetura.md): decisões técnicas (multi-tenancy, RLS, auth, documentos)
 - [docs/lgpd.md](docs/lgpd.md): como o sistema trata dados de menores e o que validar com o jurídico
 - [docs/roadmap.md](docs/roadmap.md): o que ficou para as próximas iterações
+- [docs/checklist.md](docs/checklist.md): checklist de próximos passos até a produção
