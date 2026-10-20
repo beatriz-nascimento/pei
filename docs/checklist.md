@@ -9,7 +9,7 @@ precisam estar resolvidos antes de abrir para clientes reais.
 - [ x] Escolher **um** gerenciador de pacotes. CI, Dockerfiles e README usam npm
   (`package-lock.json`), mas também existem `pnpm-lock.yaml` e `pnpm-workspace.yaml`.
   Se ficar com npm, apagar os arquivos do pnpm.
-- [ ] Rodar localmente `npm run format:check && npm run lint && npm run typecheck && npm test`.
+- [ x] Rodar localmente `npm run format:check && npm run lint && npm run typecheck && npm test`.
 - [ ] Impedir que o workflow **Deploy** falhe a cada push na `main` enquanto o GitHub não
       está configurado (ex.: `if: vars.GCP_PROJECT_ID != ''` no job, ou só `workflow_dispatch`
       por enquanto).

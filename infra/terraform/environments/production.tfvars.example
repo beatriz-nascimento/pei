@@ -3,7 +3,7 @@ project_id        = "seu-projeto-gcp"
 environment       = "production"
 github_repository = "beatriz-nascimento/pei"
 
-supabase_url      = "https://SEU-PROJETO-STAGING.supabase.co"
+supabase_url      = "https://SEU-PROJETO-PRODUCTION.supabase.co"
 supabase_anon_key = "sb_publishable_..."
 
 # Na primeira execução use URLs provisórias; depois troque pelos outputs
