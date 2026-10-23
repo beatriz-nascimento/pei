@@ -2,7 +2,7 @@
 # Imagem do frontend (Cloud Run). Build a partir da raiz do repositório:
 #   docker build -f apps/web/Dockerfile -t pei-web .
 
-FROM node:24-slim AS build
+FROM node:25-slim AS build
 WORKDIR /repo
 # Todos os package.json do workspace, para o npm ci bater com o package-lock.json.
 COPY package.json package-lock.json tsconfig.base.json ./
