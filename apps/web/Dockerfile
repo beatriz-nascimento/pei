@@ -24,5 +24,6 @@ ENV API_URL=http://localhost:3000/v1 \
 # Só estas variáveis são substituídas no template (o resto, como $uri, fica intacto).
 ENV NGINX_ENVSUBST_FILTER="^(API_URL|API_ORIGIN|SUPABASE_URL|SUPABASE_ANON_KEY)$"
 COPY apps/web/docker/default.conf.template /etc/nginx/templates/default.conf.template
+COPY apps/web/docker/security-headers.conf /etc/nginx/security-headers.conf
 COPY --from=build /repo/apps/web/dist/web/browser /usr/share/nginx/html
 EXPOSE 8080
