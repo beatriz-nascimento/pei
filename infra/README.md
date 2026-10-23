@@ -203,10 +203,9 @@ terraform apply -var-file="environments/$ENV.tfvars" \
 Preencha os segredos (os valores não passam pelo Terraform nem ficam no estado):
 
 ```bash
-# Cole a string do pooler (1.2) e tecle Enter; ela não aparece na tela nem no histórico
-read -rs DATABASE_URL
-printf '%s' "$DATABASE_URL" | gcloud secrets versions add "pei-$ENV-database-url" --data-file=-
-unset DATABASE_URL
+# Copie a string do pooler (1.2), já com a senha no lugar de [YOUR-PASSWORD], e rode:
+# (pbpaste lê da área de transferência; a senha não aparece na tela nem no histórico)
+pbpaste | tr -d '[:space:]' | gcloud secrets versions add "pei-$ENV-database-url" --data-file=-
 
 openssl rand -hex 32 | tr -d '\n' | gcloud secrets versions add "pei-$ENV-ip-hash-salt" --data-file=-
 ```
@@ -386,6 +385,7 @@ Antes de abrir para clientes, veja também as pendências de [docs/lgpd.md](../d
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `terraform apply` falha ao criar `pei-<env>-api`: segredo sem versão | Os segredos não foram preenchidos. Siga a ordem do passo 2.5.                                                                                        |
 | `/health/ready` responde 503                                         | `DATABASE_URL` errada: confira porta 6543, usuário `postgres.REF`, senha codificada para URL. Adicione nova versão do segredo e faça deploy de novo. |
+| Logs da API: `self-signed certificate in certificate chain`          | A imagem não tem a CA do Supabase. Confira `apps/api/certs/supabase-root-2021.crt` e `NODE_EXTRA_CA_CERTS` no `apps/api/Dockerfile`.                 |
 | Logs da API: `Variáveis de ambiente inválidas`                       | Algum segredo vazio ou curto (`IP_HASH_SALT` precisa de 16+ caracteres).                                                                             |
 | Login funciona, mas toda chamada à API dá 401                        | O projeto Supabase ainda assina com HS256. Veja o passo 1.3.                                                                                         |
 | Erro de CORS no navegador                                            | `web_url` no `.tfvars` diferente do endereço real do frontend (ou com `/` no final). Corrija e rode `terraform apply`.                               |
