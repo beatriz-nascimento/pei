@@ -16,7 +16,7 @@ COPY apps/web apps/web
 RUN npm run build -w @pei/shared && npm run build -w @pei/web
 
 # nginx sem root, escutando na porta 8080 (padrão do Cloud Run).
-FROM nginxinc/nginx-unprivileged:1.29-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 ENV API_URL=http://localhost:3000/v1 \
     API_ORIGIN=http://localhost:3000 \
     SUPABASE_URL=http://127.0.0.1:54321 \
