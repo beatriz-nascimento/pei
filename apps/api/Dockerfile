@@ -2,7 +2,7 @@
 # Imagem da API (Cloud Run). Build a partir da raiz do repositório:
 #   docker build -f apps/api/Dockerfile -t pei-api .
 
-FROM node:24-slim AS base
+FROM node:25-slim AS base
 WORKDIR /repo
 # Todos os package.json do workspace, para o npm ci bater com o package-lock.json.
 COPY package.json package-lock.json tsconfig.base.json ./
@@ -25,7 +25,7 @@ RUN --mount=type=cache,id=npm,target=/root/.npm \
 COPY --from=build /repo/packages/shared/dist packages/shared/dist
 COPY --from=build /repo/apps/api/dist apps/api/dist
 
-FROM node:24-slim AS runtime
+FROM node:25-slim AS runtime
 # O pooler do Supabase usa certificado da CA própria do Supabase; com ela o
 # Node verifica o TLS do banco (DATABASE_SSL=true) em vez de recusar a conexão.
 ENV NODE_ENV=production PORT=8080 \
